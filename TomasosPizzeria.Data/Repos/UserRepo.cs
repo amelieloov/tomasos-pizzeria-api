@@ -1,4 +1,7 @@
-﻿using TomasosPizzeria.Data.DataModels;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using TomasosPizzeria.Data.DataModels;
+using TomasosPizzeria.Data.Identity;
 using TomasosPizzeria.Data.Interfaces;
 using TomasosPizzeria.Domain.Entities;
 
@@ -7,34 +10,22 @@ namespace TomasosPizzeria.Data.Repos
     public class UserRepo : IUserRepo
     {
         private readonly PizzaAppContext _context;
+        private UserManager<ApplicationUser> _userManager;
 
-        public UserRepo(PizzaAppContext context)
+        public UserRepo(PizzaAppContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        public async Task AddUserAsync(ApplicationUser user)
+        public async Task<ApplicationUser> GetUserAsync(string userId)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteUserAsync(int userId)
-        {
-            var user = _context.Users.SingleOrDefault(u => u.UserId == userId);
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<ApplicationUser> GetUserAsync(string username)
-        {
-            return _context.Users.SingleOrDefault(u => u.Username == username);
+            return await _userManager.Users.SingleOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task UpdateUserAsync(ApplicationUser user)
         {
-            var userOrg = _context.Users.SingleOrDefault(u => u.UserId == user.UserId);
+            var userOrg = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == user.Id);
 
             _context.Users.Entry(userOrg).CurrentValues.SetValues(user);
             await _context.SaveChangesAsync();

@@ -1,6 +1,8 @@
-﻿namespace TomasosPizzeria.Core.Services
+﻿using TomasosPizzeria.Core.Interfaces;
+
+namespace TomasosPizzeria.Core.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
     }
 }

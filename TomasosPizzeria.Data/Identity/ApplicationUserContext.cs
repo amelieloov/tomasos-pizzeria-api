@@ -5,7 +5,7 @@ namespace TomasosPizzeria.Data.Identity
 {
     public class ApplicationUserContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationUserContext(DbContextOptions options) : base(options)
+        public ApplicationUserContext(DbContextOptions<ApplicationUserContext> options) : base(options)
         {
         }
     }

@@ -1,12 +1,13 @@
 ﻿using TomasosPizzeria.Data.Identity;
+using TomasosPizzeria.Domain.DTOs;
 
 namespace TomasosPizzeria.Core.Interfaces
 {
     public interface IUserService
     {
-        Task<ApplicationUser> GetUserAsync(string username);
-        Task AddUserAsync(ApplicationUser user);
-        Task UpdateUserAsync(ApplicationUser user);
-        Task DeleteUserAsync(int userId);
+        Task<bool> Register(UserDTO user);
+        Task<string?> Login(LoginDTO user);
+        Task UpdateUserAsync(string userId, UserDTO userDto);
+        Task<UserDTO> GetUserAsync(string userId);
     }
 }

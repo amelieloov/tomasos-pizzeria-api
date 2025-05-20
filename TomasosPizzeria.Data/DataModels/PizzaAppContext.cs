@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TomasosPizzeria.Data.Identity;
 using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Data.DataModels
 {
     public class PizzaAppContext : DbContext
     {
-        public PizzaAppContext(DbContextOptions options) : base(options)
+        public PizzaAppContext(DbContextOptions<PizzaAppContext> options) : base(options)
         {
         }
 

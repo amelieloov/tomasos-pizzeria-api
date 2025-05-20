@@ -1,12 +1,11 @@
-﻿using TomasosPizzeria.Domain.Entities;
+﻿
+using TomasosPizzeria.Data.Identity;
 
 namespace TomasosPizzeria.Data.Interfaces
 {
     public interface IUserRepo
     {
-        Task<ApplicationUser> GetUserAsync(string username);
-        Task AddUserAsync(ApplicationUser user);
+        Task<ApplicationUser> GetUserAsync(string userId);
         Task UpdateUserAsync(ApplicationUser user);
-        Task DeleteUserAsync(int userId);
     }
 }

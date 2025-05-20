@@ -4,45 +4,53 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TomasosPizzeria.Core.Interfaces;
 using TomasosPizzeria.Data.Identity;
-using TomasosPizzeria.Data.Interfaces;
 using TomasosPizzeria.Domain.DTOs;
 
 namespace TomasosPizzeria.Core.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly IUserRepo _repo;
         private SignInManager<ApplicationUser> _signInManager;
         private UserManager<ApplicationUser> _userManager;
         private IConfiguration _configuration;
 
-        public UserService(IUserRepo repo, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public UserService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            _repo = repo;
             _signInManager = signInManager;
             _userManager = userManager;
             _configuration = configuration;
         }
 
-        public async Task<bool> Login(UserDTO user)
+        public async Task<string?> Login(LoginDTO user)
         {
             var result = await _signInManager
                  .PasswordSignInAsync(user.UserName, user.Password,
                                         false, false);
 
-            var appUser = new ApplicationUser()
+            var appUser = await _userManager.FindByNameAsync(user.UserName);
+            if (appUser == null)
             {
-                UserName = user.UserName,
-                PasswordHash = user.Password
+                //Error handling
+            }
+
+            var roles = await _userManager.GetRolesAsync(appUser);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
+                new Claim(ClaimTypes.Name, appUser.UserName)
             };
 
-            //Här vill vi oftast skapa en JWT token som även innehåller vilken 
-            //behörighet användaren har. Behörighet kan hämtas med tex
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
-            var token = GenerateJwtToken(appUser);
+            var token = GenerateJwtToken(claims);
 
-            return result.Succeeded;
+            return token;
         }
 
         public async Task<bool> Register(UserDTO user)
@@ -50,7 +58,6 @@ namespace TomasosPizzeria.Core.Services
             var newUser = new ApplicationUser()
             {
                 UserName = user.UserName
-                //PasswordHash = user.Password
             };
 
             var result = await _userManager.CreateAsync(newUser, user.Password);
@@ -58,34 +65,62 @@ namespace TomasosPizzeria.Core.Services
             return result.Succeeded;
         }
 
-        //public string GenerateJwtToken(ApplicationUser user)
-        //{
-        //    var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        //    var issuer = _configuration["Jwt:Issuer"];
-        //    var audience = _configuration["Jwt:Audience"];
+        public string GenerateJwtToken(List<Claim> claims)
+        {
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
 
-        //    var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-        //    var claims = _userManager.GetClaimsAsync(user);
-        //    var roles = _userManager.GetRolesAsync(user);
+            var tokenOptions = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(60),
+                signingCredentials: signingCredentials
+                );
 
-        //    var claims = new[]
-        //    {
-        //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        //        new Claim(ClaimTypes.Role, user.RoleName.ToString())
-        //    };
+            var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        //    var tokenOptions = new JwtSecurityToken(
-        //        issuer: issuer,
-        //        audience: audience,
-        //        claims: claims,
-        //        expires: DateTime.Now.AddMinutes(60),
-        //        signingCredentials: signingCredentials
-        //        );
+            return token;
+        }
 
-        //    var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        public async Task UpdateUserAsync(string userId, UserDTO userDto)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) throw new Exception("User not found");
 
-        //    return token;
-        //}
+            user.UserName = userDto.UserName;
+            user.Email = userDto.Email;
+            user.PhoneNumber = userDto.PhoneNumber;
+
+            if (!string.IsNullOrWhiteSpace(userDto.Password))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, userDto.Password);
+                if (!result.Succeeded)
+                {
+                    throw new Exception("Password update failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+            }
+
+            await _userManager.UpdateAsync(user);
+        }
+
+
+        public async Task<UserDTO> GetUserAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            var userDto = new UserDTO()
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return userDto;
+        }
     }
 }
