@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Data.Identity
 {

@@ -5,8 +5,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TomasosPizzeria.Core.Interfaces;
-using TomasosPizzeria.Data.Identity;
 using TomasosPizzeria.Domain.DTOs;
+using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Core.Services
 {

@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TomasosPizzeria.Data.DataModels;
 
 #nullable disable
 
-namespace TomasosPizzeria.Data.Migrations
+namespace TomasosPizzeria.Data.Migrations.Pizza
 {
     [DbContext(typeof(PizzaAppContext))]
-    partial class PizzaAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250520171325_updated_order_dishes_relation")]
+    partial class updated_order_dishes_relation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace TomasosPizzeria.Data.Migrations
 
                     b.HasIndex("IngredientsIngredientId");
 
-                    b.ToTable("DishIngredient", (string)null);
+                    b.ToTable("DishIngredient");
                 });
 
             modelBuilder.Entity("DishOrder", b =>
@@ -143,8 +146,8 @@ namespace TomasosPizzeria.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.HasKey("DishId");
 
@@ -183,8 +186,8 @@ namespace TomasosPizzeria.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()

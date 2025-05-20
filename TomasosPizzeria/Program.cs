@@ -6,8 +6,8 @@ using TomasosPizzeria.Core.Interfaces;
 using TomasosPizzeria.Core.Services;
 using TomasosPizzeria.Data.DataModels;
 using TomasosPizzeria.Data.Identity;
-using TomasosPizzeria.Data.Interfaces;
-using TomasosPizzeria.Data.Repos;
+using TomasosPizzeria.Domain.Entities;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +19,12 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
+builder.Services.AddDbContext<PizzaAppContext>(options =>
+    options.UseSqlServer(@"Data Source=MSI;Initial Catalog=TomasosPizzaDB;Integrated Security=SSPI;TrustServerCertificate=True;"));
 
+builder.Services.AddDbContext<ApplicationUserContext>(options =>
+    options.UseSqlServer(@"Data Source=MSI;Initial Catalog=TomasosPizzaDB;Integrated Security=SSPI;TrustServerCertificate=True;"));
+//builder.Configuration.GetConnectionString("DefaultConnection"))
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
        .AddEntityFrameworkStores<ApplicationUserContext>()
@@ -28,9 +33,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 //DI Container
-builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IDishService, DishService>();
+builder.Services.AddScoped<IIngredientService, IngredientService>();
 
 builder.Services.AddSwaggerExtended();
 
