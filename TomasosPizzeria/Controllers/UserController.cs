@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TomasosPizzeria.Core.Interfaces;
@@ -27,9 +26,9 @@ namespace TomasosPizzeria.Api.Controllers
                 var token = await _userService.Login(user);
                 return Ok(new { Token = token });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Unauthorized();
+                return Unauthorized(new { ex.Message });
             }
         }
 
@@ -56,13 +55,23 @@ namespace TomasosPizzeria.Api.Controllers
         }
 
         [Authorize]
-        [HttpPut]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateUserAsync(UserDTO user)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
             await _userService.UpdateUserAsync(userId, user);
 
             return Ok();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("updaterole")]
+        public async Task<IActionResult> UpdateUserRoleAsync(string username, string newRole)
+        {
+            var result = await _userService.UpdateUserRoleAsync(username, newRole);
+
+            if (result) return Ok();
+            else return BadRequest();
         }
     }
 }

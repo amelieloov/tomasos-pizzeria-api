@@ -12,9 +12,9 @@ namespace TomasosPizzeria.Core.Services
 {
     public class UserService : IUserService
     {
-        private SignInManager<ApplicationUser> _signInManager;
-        private UserManager<ApplicationUser> _userManager;
-        private IConfiguration _configuration;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
         public UserService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
@@ -32,7 +32,7 @@ namespace TomasosPizzeria.Core.Services
             var appUser = await _userManager.FindByNameAsync(user.UserName);
             if (appUser == null)
             {
-                //Error handling
+                throw new Exception("Invalid login credentials.");
             }
 
             var roles = await _userManager.GetRolesAsync(appUser);
@@ -57,17 +57,20 @@ namespace TomasosPizzeria.Core.Services
         {
             var newUser = new ApplicationUser()
             {
-                UserName = user.UserName
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
             };
 
             var result = await _userManager.CreateAsync(newUser, user.Password);
+            await _userManager.AddToRoleAsync(newUser, "RegularUser");
 
             return result.Succeeded;
         }
 
         public string GenerateJwtToken(List<Claim> claims)
         {
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecretKey"]));
             var issuer = _configuration["Jwt:Issuer"];
             var audience = _configuration["Jwt:Audience"];
 
@@ -106,6 +109,22 @@ namespace TomasosPizzeria.Core.Services
             }
 
             await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<bool> UpdateUserRoleAsync(string username, string newRole)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return false;
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Remove all current roles
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (!removeResult.Succeeded) return false;
+
+            // Add the new role
+            var addResult = await _userManager.AddToRoleAsync(user, newRole);
+            return addResult.Succeeded;
         }
 
 

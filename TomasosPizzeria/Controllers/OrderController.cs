@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TomasosPizzeria.Core.Interfaces;
+using TomasosPizzeria.Domain.DTOs;
 
 namespace TomasosPizzeria.Api.Controllers
 {
@@ -15,13 +17,24 @@ namespace TomasosPizzeria.Api.Controllers
             _service = service;
         }
 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddOrderAsync(List<int> dishIds)
+        public async Task<IActionResult> AddOrderAsync(List<DishAddDTO> dishDtos)
         {
-
-            _service.AddOrderAsync();
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
+            await _service.AddOrderAsync(userId, dishDtos);
 
             return Created();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetOrdersByUserAsync()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
+            var orders = await _service.GetOrdersByUserAsync(userId);
+
+            return Ok(orders);
         }
     }
 }

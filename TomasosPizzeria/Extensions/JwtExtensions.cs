@@ -9,7 +9,7 @@ namespace TomasosPizzeria.Api.Extensions
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
 
-            var secretKey = configuration["Jwt:Key"];
+            var secretKey = configuration["JwtSecretKey"];
             var issuer = configuration["Jwt:Issuer"];
             var audience = configuration["Jwt:Audience"];
 

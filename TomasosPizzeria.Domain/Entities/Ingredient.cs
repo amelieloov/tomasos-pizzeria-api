@@ -10,6 +10,6 @@ namespace TomasosPizzeria.Domain.Entities
         [Required]
         [StringLength(50)]
         public string Name { get; set; }
-        public List<Dish> Dishes { get; set; }
+        public ICollection<Dish> Dishes { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TomasosPizzeria.Core.Interfaces;
 using TomasosPizzeria.Domain.DTOs;
@@ -6,6 +7,7 @@ using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Api.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class DishController : ControllerBase
@@ -23,6 +25,14 @@ namespace TomasosPizzeria.Api.Controllers
             await _service.AddDishAsync(dish);
 
             return Created();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDishAsync(int dishId, DishDTO dishDto)
+        {
+            await _service.UpdateDishAsync(dishId, dishDto);
+
+            return Ok();
         }
     }
 }

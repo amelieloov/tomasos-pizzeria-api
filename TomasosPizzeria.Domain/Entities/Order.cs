@@ -9,12 +9,15 @@ namespace TomasosPizzeria.Domain.Entities
 
         [Required]
         public decimal TotalPrice { get; set; }
+
         public string Status { get; set; }
+
+        public string UserId { get; set; }
 
         [Required]
         public ApplicationUser User { get; set; }
 
         [Required]
-        public List<Dish> Dishes { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; }
     }
 }

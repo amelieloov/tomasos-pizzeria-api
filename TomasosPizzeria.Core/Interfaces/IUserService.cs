@@ -9,5 +9,7 @@ namespace TomasosPizzeria.Core.Interfaces
         Task<string?> Login(LoginDTO user);
         Task UpdateUserAsync(string userId, UserDTO userDto);
         Task<UserDTO> GetUserAsync(string userId);
+        Task<bool> UpdateUserRoleAsync(string username, string newRole);
+
     }
 }

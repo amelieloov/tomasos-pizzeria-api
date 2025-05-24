@@ -23,8 +23,8 @@ namespace TomasosPizzeria.Domain.Entities
         [Required]
         public Category Category { get; set; }
 
-        public List<Ingredient> Ingredients { get; set; }
+        public ICollection<Ingredient> Ingredients { get; set; }
 
-        public List<Order> Orders { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; }
     }
 }
