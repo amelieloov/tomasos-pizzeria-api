@@ -1,12 +1,9 @@
 using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 using System.Text.Json.Serialization;
 using TomasosPizzeria.Api.Extensions;
+using TomasosPizzeria.Api.Seeding;
 using TomasosPizzeria.Core.Interfaces;
 using TomasosPizzeria.Core.Services;
 using TomasosPizzeria.Data.DataModels;
@@ -23,14 +20,24 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-//var secrets = await builder.GetSecretsFromKeyVaultAsync("ConnString", "JwtSecretKey");
+//var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
 
-var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
-//var client = new SecretClient(new Uri(keyVaultUri), new DefaultAzureCredential());
+//builder.Configuration.AddAzureKeyVault(
+//    new Uri(keyVaultUri),
+//    new DefaultAzureCredential());
 
-builder.Configuration.AddAzureKeyVault(
-    new Uri(keyVaultUri),
-    new DefaultAzureCredential());
+try
+{
+    var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
+
+    builder.Configuration.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential());
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Key Vault connection failed: {ex.Message}");
+}
 
 var connString = builder.Configuration["ConnString"];
 
@@ -46,11 +53,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
-//DI Container
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IDishService, DishService>();
-builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddApplicationDependencies();
 
 builder.Services.AddSwaggerExtended();
 
@@ -68,7 +71,7 @@ app.UseSwaggerExtended();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await RoleExtensions.SeedRolesAsync(services);
+    await RoleSeeder.SeedRolesAsync(services);
 }
 
 app.Run();

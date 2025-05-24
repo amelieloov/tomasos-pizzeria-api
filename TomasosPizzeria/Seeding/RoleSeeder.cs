@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace TomasosPizzeria.Api.Extensions
+namespace TomasosPizzeria.Api.Seeding
 {
-    public static class RoleExtensions
+    public class RoleSeeder
     {
         public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
@@ -19,6 +19,5 @@ namespace TomasosPizzeria.Api.Extensions
                 }
             }
         }
-
     }
 }
