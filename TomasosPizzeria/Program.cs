@@ -20,12 +20,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-//var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
-
-//builder.Configuration.AddAzureKeyVault(
-//    new Uri(keyVaultUri),
-//    new DefaultAzureCredential());
-
 try
 {
     var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
