@@ -65,6 +65,17 @@ app.UseSwaggerExtended();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
+    var userDb = services.GetRequiredService<ApplicationUserContext>();
+    userDb.Database.Migrate();
+
+    var pizzaDb = services.GetRequiredService<PizzaAppContext>();
+    pizzaDb.Database.Migrate();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
     await RoleSeeder.SeedRolesAsync(services);
 }
 

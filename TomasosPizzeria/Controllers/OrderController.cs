@@ -36,5 +36,24 @@ namespace TomasosPizzeria.Api.Controllers
 
             return Ok(orders);
         }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateStatus(int orderId, string newStatus)
+        {
+            await _service.UpdateStatusAsync(orderId, newStatus);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteOrderAsync(int orderId)
+        {
+            await _service.DeleteOrderAsync(orderId);
+
+            return Ok();
+        }
     }
 }

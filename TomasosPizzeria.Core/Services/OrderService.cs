@@ -98,7 +98,7 @@ namespace TomasosPizzeria.Core.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateStatus(int orderId, string newStatus)
+        public async Task UpdateStatusAsync(int orderId, string newStatus)
         {
             var order = await _context.Orders.SingleOrDefaultAsync(o => o.OrderId == orderId);
 

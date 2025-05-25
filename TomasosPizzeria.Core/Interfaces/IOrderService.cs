@@ -8,6 +8,6 @@ namespace TomasosPizzeria.Core.Interfaces
         Task AddOrderAsync(string userId, List<DishAddDTO> dishDtos);
         Task<List<OrderDTO>> GetOrdersByUserAsync(string userId);
         Task DeleteOrderAsync(int orderId);
-        Task UpdateStatus(int orderId, string newStatus);
+        Task UpdateStatusAsync(int orderId, string newStatus);
     }
 }
