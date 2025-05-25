@@ -68,7 +68,7 @@ namespace TomasosPizzeria.Core.Services
             return result.Succeeded;
         }
 
-        public string GenerateJwtToken(List<Claim> claims)
+        private string GenerateJwtToken(List<Claim> claims)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecretKey"]));
             var issuer = _configuration["Jwt:Issuer"];

@@ -4,7 +4,11 @@ namespace TomasosPizzeria.Data.Interfaces
 {
     public interface IOrderRepo
     {
-        void AddOrder(Order order);
-        List<Order> GetOrders();
+        Task<List<Order>> GetOrdersByUserIdAsync(string userId);
+        Task<Order?> GetByIdAsync(int orderId);
+        void Add(Order order);
+        void UpdateStatus(Order order);
+        void Remove(Order order);
+        Task SaveChangesAsync();
     }
 }

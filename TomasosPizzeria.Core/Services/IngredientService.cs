@@ -1,16 +1,17 @@
 ﻿using TomasosPizzeria.Core.Interfaces;
 using TomasosPizzeria.Data.DataModels;
+using TomasosPizzeria.Data.Interfaces;
 using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Core.Services
 {
     public class IngredientService : IIngredientService
     {
-        private readonly PizzaAppContext _context;
+        private readonly IIngredientRepo _repo;
 
-        public IngredientService(PizzaAppContext context)
+        public IngredientService(IIngredientRepo repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task AddIngredientAsync(string name)
@@ -20,8 +21,7 @@ namespace TomasosPizzeria.Core.Services
                 Name = name
             };
 
-            _context.Ingredients.Add(ingredient);
-            await _context.SaveChangesAsync();
+            await _repo.AddIngredientAsync(ingredient);
         }
     }
 }

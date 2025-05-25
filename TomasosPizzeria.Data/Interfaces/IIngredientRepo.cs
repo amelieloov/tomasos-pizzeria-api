@@ -2,11 +2,9 @@
 
 namespace TomasosPizzeria.Data.Interfaces
 {
-    public interface IDishRepo
+    public interface IIngredientRepo
     {
+        Task AddIngredientAsync(Ingredient ingredient);
         Task<List<Ingredient>> GetIngredientsByIdsAsync(List<int> ids);
-        Task AddDishAsync(Dish dish);
-        Task<Dish?> GetDishByIdAsync(int id);
-        Task SaveChangesAsync();
     }
 }

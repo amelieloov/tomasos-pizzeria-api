@@ -10,11 +10,11 @@ namespace TomasosPizzeria.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserService _service;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService _service)
         {
-            _userService = userService;
+            this._service = _service;
         }
 
         [HttpPost]
@@ -23,7 +23,7 @@ namespace TomasosPizzeria.Api.Controllers
         {
             try
             {
-                var token = await _userService.Login(user);
+                var token = await _service.Login(user);
                 return Ok(new { Token = token });
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace TomasosPizzeria.Api.Controllers
         [Route("register")]
         public async Task<IActionResult> Register(UserDTO user)
         {
-            var result = await _userService.Register(user);
+            var result = await _service.Register(user);
 
             if (result)
                 return Created();
@@ -49,7 +49,7 @@ namespace TomasosPizzeria.Api.Controllers
         public async Task<IActionResult> GetUserAsync()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
-            var user = await _userService.GetUserAsync(userId);
+            var user = await _service.GetUserAsync(userId);
 
             return Ok(user);
         }
@@ -59,7 +59,7 @@ namespace TomasosPizzeria.Api.Controllers
         public async Task<IActionResult> UpdateUserAsync(UserDTO user)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
-            await _userService.UpdateUserAsync(userId, user);
+            await _service.UpdateUserAsync(userId, user);
 
             return Ok();
         }
@@ -68,7 +68,7 @@ namespace TomasosPizzeria.Api.Controllers
         [HttpPut("updaterole")]
         public async Task<IActionResult> UpdateUserRoleAsync(string username, string newRole)
         {
-            var result = await _userService.UpdateUserRoleAsync(username, newRole);
+            var result = await _service.UpdateUserRoleAsync(username, newRole);
 
             if (result) return Ok();
             else return BadRequest();
