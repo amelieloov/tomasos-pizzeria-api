@@ -20,18 +20,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-try
-{
-    var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
+var keyVaultUri = builder.Configuration.GetValue<string>("KeyVault:KeyVaultURL");
 
-    builder.Configuration.AddAzureKeyVault(
-        new Uri(keyVaultUri),
-        new DefaultAzureCredential());
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Key Vault connection failed: {ex.Message}");
-}
+builder.Configuration.AddAzureKeyVault(
+    new Uri(keyVaultUri),
+    new DefaultAzureCredential());
 
 var connString = builder.Configuration["ConnString"];
 

@@ -16,6 +16,13 @@ namespace TomasosPizzeria.Core.Services
             _ingredientRepo = ingredientRepo;
         }
 
+        public async Task<List<Dish>> GetDishesAsync()
+        {
+
+            //mappning
+            return await _dishRepo.GetDishesAsync();
+        }
+
         public async Task AddDishAsync(DishDTO dishDto)
         {
             var ingredients = await _ingredientRepo.GetIngredientsByIdsAsync(dishDto.IngredientIds);
@@ -24,12 +31,13 @@ namespace TomasosPizzeria.Core.Services
             {
                 Name = dishDto.Name,
                 Description = dishDto.Description,
-                Price = dishDto.Price,
-                CategoryId = dishDto.CategoryId,
+                Price = (decimal)dishDto.Price,
+                CategoryId = (int)dishDto.CategoryId,
                 Ingredients = ingredients
             };
 
-            await _dishRepo.AddDishAsync(dish);
+            _dishRepo.Add(dish);
+            await _dishRepo.SaveChangesAsync();
         }
 
         public async Task UpdateDishAsync(int dishId, DishDTO dishDto)
@@ -37,16 +45,25 @@ namespace TomasosPizzeria.Core.Services
             var existingDish = await _dishRepo.GetDishByIdAsync(dishId);
 
             if (existingDish == null)
-            {
                 throw new Exception("Dish not found");
+
+            if (!string.IsNullOrEmpty(dishDto.Name))
+                existingDish.Name = dishDto.Name;
+
+            if (!string.IsNullOrEmpty(dishDto.Description))
+                existingDish.Description = dishDto.Description;
+
+            if (dishDto.Price.HasValue)
+                existingDish.Price = (decimal)dishDto.Price;
+
+            if (dishDto.CategoryId.HasValue)
+                existingDish.CategoryId = (int)dishDto.CategoryId;
+
+            if (dishDto.IngredientIds == null)
+            {
+                var newIngredients = await _ingredientRepo.GetIngredientsByIdsAsync(dishDto.IngredientIds);
+                existingDish.Ingredients = newIngredients;
             }
-
-            existingDish.Name = dishDto.Name;
-            existingDish.Description = dishDto.Description;
-            existingDish.Price = dishDto.Price;
-            existingDish.CategoryId = dishDto.CategoryId;
-
-            // optionally update ingredients here too
 
             await _dishRepo.SaveChangesAsync();
         }

@@ -2,12 +2,12 @@
 
 namespace TomasosPizzeria.Domain.DTOs
 {
-    public class OrderDTO
+    public class OrderReadDTO
     {
         public decimal TotalPrice { get; set; }
 
         public string Status { get; set; }
 
-        public List<DishDTO> Dishes { get; set; }
+        public List<DishReadDTO> Dishes { get; set; }
     }
 }

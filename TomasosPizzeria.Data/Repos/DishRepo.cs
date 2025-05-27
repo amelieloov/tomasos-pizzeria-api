@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TomasosPizzeria.Data.DataModels;
+using TomasosPizzeria.Data.Interfaces;
 using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Data.Repos
 {
-    public class DishRepo
+    public class DishRepo : IDishRepo
     {
         private readonly PizzaAppContext _context;
 
@@ -13,16 +14,20 @@ namespace TomasosPizzeria.Data.Repos
             _context = context;
         }
 
-        public async Task AddDishAsync(Dish dish)
+        public async Task<List<Dish>> GetDishesAsync()
+        {
+            return await _context.Dishes.ToListAsync();
+        }
+
+        public void Add(Dish dish)
         {
             _context.Dishes.Add(dish);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<Dish?> GetDishByIdAsync(int id)
         {
             return await _context.Dishes
-                .Include(d => d.Ingredients) // include if needed
+                .Include(d => d.Ingredients)
                 .SingleOrDefaultAsync(d => d.DishId == id);
         }
 

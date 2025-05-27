@@ -39,7 +39,7 @@ namespace TomasosPizzeria.Api.Controllers
 
 
         [Authorize(Roles = "Admin")]
-        [HttpPut]
+        [HttpPut("updatestatus")]
         public async Task<IActionResult> UpdateStatus(int orderId, string newStatus)
         {
             await _service.UpdateStatusAsync(orderId, newStatus);

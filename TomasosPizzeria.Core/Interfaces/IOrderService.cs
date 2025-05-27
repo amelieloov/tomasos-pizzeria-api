@@ -6,7 +6,7 @@ namespace TomasosPizzeria.Core.Interfaces
     public interface IOrderService
     {
         Task AddOrderAsync(string userId, List<DishAddDTO> dishDtos);
-        Task<List<OrderDTO>> GetOrdersByUserAsync(string userId);
+        Task<List<OrderReadDTO>> GetOrdersByUserAsync(string userId);
         Task DeleteOrderAsync(int orderId);
         Task UpdateStatusAsync(int orderId, string newStatus);
     }

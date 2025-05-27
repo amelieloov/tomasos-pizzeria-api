@@ -14,10 +14,14 @@ namespace TomasosPizzeria.Data.Repos
             _context = context;
         }
 
-        public async Task AddIngredientAsync(Ingredient ingredient)
+        public void Add(Ingredient ingredient)
         {
             _context.Ingredients.Add(ingredient);
-            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Ingredient>> GetIngredientsAsync()
+        {
+            return await _context.Ingredients.ToListAsync();
         }
 
         public async Task<List<Ingredient>> GetIngredientsByIdsAsync(List<int> ids)
@@ -25,6 +29,11 @@ namespace TomasosPizzeria.Data.Repos
             return await _context.Ingredients
                 .Where(i => ids.Contains(i.IngredientId))
                 .ToListAsync();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

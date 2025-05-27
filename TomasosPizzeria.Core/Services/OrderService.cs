@@ -25,10 +25,11 @@ namespace TomasosPizzeria.Core.Services
             var user = await _userManager.FindByIdAsync(userId);
             var userRoles = await _userManager.GetRolesAsync(user);
             var dishQuantity = dishDtos.Sum(d => d.Quantity);
+            user.BonusPoints += 10 * dishQuantity;
 
-            ApplyPremiumUserDiscount(totalPrice, userRoles, dishQuantity);
-            var orderItems = GenerateOrderItemsAndAddBonusPoints(dishDtos, user);
-            ApplyBonusIfEligible(orderItems, user);
+            totalPrice = ApplyPremiumUserDiscount(totalPrice, userRoles, dishQuantity);
+            var orderItems = GenerateOrderItems(dishDtos, user);
+            orderItems = ApplyBonusIfEligible(orderItems, user);
 
             var order = new Order()
             {
@@ -61,50 +62,51 @@ namespace TomasosPizzeria.Core.Services
             return totalPrice;
         }
 
-        private void ApplyPremiumUserDiscount(decimal totalPrice, IList<string> userRoles, int dishQuantity)
+        private decimal ApplyPremiumUserDiscount(decimal totalPrice, IList<string> userRoles, int dishQuantity)
         {
             if (userRoles.Contains("PremiumUser") && dishQuantity >= 3)
             {
                 totalPrice = totalPrice * 0.8m;
             }
+
+            return totalPrice;
         }
 
-        private List<OrderItem> GenerateOrderItemsAndAddBonusPoints(List<DishAddDTO> dishDtos, ApplicationUser user)
+        private List<OrderItem> GenerateOrderItems(List<DishAddDTO> dishDtos, ApplicationUser user)
         {
             var orderItems = new List<OrderItem>();
 
             foreach (var item in dishDtos)
             {
                 orderItems.Add(new OrderItem { DishId = item.DishId, Quantity = item.Quantity });
-                user.BonusPoints += 10;
             }
 
             return orderItems;
         }
 
-        private void ApplyBonusIfEligible(List<OrderItem> orderItems, ApplicationUser user)
+        private List<OrderItem> ApplyBonusIfEligible(List<OrderItem> orderItems, ApplicationUser user)
         {
             if (user.BonusPoints >= 100)
             {
                 orderItems.Add(new OrderItem { DishId = 2, Quantity = 1 });
                 user.BonusPoints -= 100;
             }
+
+            return orderItems;
         }
 
-        public async Task<List<OrderDTO>> GetOrdersByUserAsync(string userId)
+        public async Task<List<OrderReadDTO>> GetOrdersByUserAsync(string userId)
         {
             var orders = await _orderRepo.GetOrdersByUserIdAsync(userId);
 
-            var orderDtos = orders.Select(o => new OrderDTO
+            var orderDtos = orders.Select(o => new OrderReadDTO
             {
                 TotalPrice = o.TotalPrice,
                 Status = o.Status,
-                Dishes = o.OrderItems.Select(oi => new DishDTO
+                Dishes = o.OrderItems.Select(oi => new DishReadDTO
                 {
                     Name = oi.Dish.Name,
-                    Description = oi.Dish.Description,
-                    Price = oi.Dish.Price,
-                    CategoryId = oi.Dish.CategoryId
+                    Quantity = oi.Quantity
                 }).ToList()
             }).ToList();
 
@@ -123,8 +125,8 @@ namespace TomasosPizzeria.Core.Services
             var order = await _orderRepo.GetByIdAsync(orderId);
 
             order.Status = newStatus;
-            _orderRepo.UpdateStatus(order);
 
+            _orderRepo.UpdateStatus(order);
             await _orderRepo.SaveChangesAsync();
         }
     }

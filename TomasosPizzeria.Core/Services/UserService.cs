@@ -94,9 +94,14 @@ namespace TomasosPizzeria.Core.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new Exception("User not found");
 
-            user.UserName = userDto.UserName;
-            user.Email = userDto.Email;
-            user.PhoneNumber = userDto.PhoneNumber;
+            if (!string.IsNullOrEmpty(userDto.UserName))
+                user.UserName = userDto.UserName;
+
+            if (!string.IsNullOrEmpty(userDto.Email))
+                user.Email = userDto.Email;
+
+            if (!string.IsNullOrEmpty(userDto.PhoneNumber))
+                user.PhoneNumber = userDto.PhoneNumber;
 
             if (!string.IsNullOrWhiteSpace(userDto.Password))
             {
@@ -128,15 +133,18 @@ namespace TomasosPizzeria.Core.Services
         }
 
 
-        public async Task<UserDTO> GetUserAsync(string userId)
+        public async Task<UserReadDTO> GetUserAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
 
-            var userDto = new UserDTO()
+            var userDto = new UserReadDTO()
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                BonusPoints = user.BonusPoints,
+                Role = roles.FirstOrDefault()
             };
 
             return userDto;

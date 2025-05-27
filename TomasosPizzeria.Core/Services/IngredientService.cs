@@ -1,5 +1,4 @@
 ﻿using TomasosPizzeria.Core.Interfaces;
-using TomasosPizzeria.Data.DataModels;
 using TomasosPizzeria.Data.Interfaces;
 using TomasosPizzeria.Domain.Entities;
 
@@ -14,6 +13,11 @@ namespace TomasosPizzeria.Core.Services
             _repo = repo;
         }
 
+        public async Task<List<Ingredient>> GetIngredientsAsync()
+        {
+            return await _repo.GetIngredientsAsync();
+        }
+
         public async Task AddIngredientAsync(string name)
         {
             var ingredient = new Ingredient
@@ -21,7 +25,8 @@ namespace TomasosPizzeria.Core.Services
                 Name = name
             };
 
-            await _repo.AddIngredientAsync(ingredient);
+            _repo.Add(ingredient);
+            await _repo.SaveChangesAsync();
         }
     }
 }

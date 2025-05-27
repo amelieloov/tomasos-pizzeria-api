@@ -17,10 +17,19 @@ namespace TomasosPizzeria.Api.Controllers
             _service = service;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetIngredients()
+        {
+            var ingredients = await _service.GetIngredientsAsync();
+
+            return Ok(ingredients);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddIngredient(string name)
         {
             await _service.AddIngredientAsync(name);
+
             return Created();
         }
     }
