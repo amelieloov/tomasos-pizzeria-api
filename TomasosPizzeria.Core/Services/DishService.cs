@@ -16,11 +16,20 @@ namespace TomasosPizzeria.Core.Services
             _ingredientRepo = ingredientRepo;
         }
 
-        public async Task<List<Dish>> GetDishesAsync()
+        public async Task<List<DishDetailedReadDTO>> GetDishesAsync()
         {
+            var dishes = await _dishRepo.GetDishesAsync();
 
-            //mappning
-            return await _dishRepo.GetDishesAsync();
+            var dishDtos = dishes.Select(d => new DishDetailedReadDTO()
+            {
+                Name = d.Name,
+                Description = d.Description,
+                Price = d.Price,
+                Category = d.Category.Name,
+                Ingredients = d.Ingredients.Select(i => i.Name).ToList()
+            }).ToList();
+
+            return dishDtos;
         }
 
         public async Task AddDishAsync(DishDTO dishDto)
@@ -59,7 +68,7 @@ namespace TomasosPizzeria.Core.Services
             if (dishDto.CategoryId.HasValue)
                 existingDish.CategoryId = (int)dishDto.CategoryId;
 
-            if (dishDto.IngredientIds == null)
+            if (dishDto.IngredientIds != null && dishDto.IngredientIds.Any())
             {
                 var newIngredients = await _ingredientRepo.GetIngredientsByIdsAsync(dishDto.IngredientIds);
                 existingDish.Ingredients = newIngredients;

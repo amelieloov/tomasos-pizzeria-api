@@ -21,20 +21,34 @@ namespace TomasosPizzeria.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddOrderAsync(List<DishAddDTO> dishDtos)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
-            await _service.AddOrderAsync(userId, dishDtos);
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
+                await _service.AddOrderAsync(userId, dishDtos);
 
-            return Created();
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetOrdersByUserAsync()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
-            var orders = await _service.GetOrdersByUserAsync(userId);
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
+                var orders = await _service.GetOrdersByUserAsync(userId);
 
-            return Ok(orders);
+                return Ok(orders);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
 
@@ -42,18 +56,30 @@ namespace TomasosPizzeria.Api.Controllers
         [HttpPut("updatestatus")]
         public async Task<IActionResult> UpdateStatus(int orderId, string newStatus)
         {
-            await _service.UpdateStatusAsync(orderId, newStatus);
-
-            return Ok();
+            try
+            {
+                await _service.UpdateStatusAsync(orderId, newStatus);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteOrderAsync(int orderId)
         {
-            await _service.DeleteOrderAsync(orderId);
-
-            return Ok();
+            try
+            {
+                await _service.DeleteOrderAsync(orderId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

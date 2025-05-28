@@ -5,7 +5,6 @@ using TomasosPizzeria.Core.Interfaces;
 
 namespace TomasosPizzeria.Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class IngredientController : ControllerBase
@@ -25,6 +24,7 @@ namespace TomasosPizzeria.Api.Controllers
             return Ok(ingredients);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddIngredient(string name)
         {

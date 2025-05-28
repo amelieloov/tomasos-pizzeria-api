@@ -7,7 +7,6 @@ using TomasosPizzeria.Domain.Entities;
 
 namespace TomasosPizzeria.Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class DishController : ControllerBase
@@ -27,20 +26,34 @@ namespace TomasosPizzeria.Api.Controllers
             return Ok(dishes);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddDishAsync(DishDTO dish)
         {
-            await _service.AddDishAsync(dish);
-
-            return Created();
+            try
+            {
+                await _service.AddDishAsync(dish);
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> UpdateDishAsync(int dishId, DishDTO dishDto)
         {
-            await _service.UpdateDishAsync(dishId, dishDto);
-
-            return Ok();
+            try
+            {
+                await _service.UpdateDishAsync(dishId, dishDto);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

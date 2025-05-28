@@ -16,7 +16,10 @@ namespace TomasosPizzeria.Data.Repos
 
         public async Task<List<Dish>> GetDishesAsync()
         {
-            return await _context.Dishes.ToListAsync();
+            return await _context.Dishes
+                .Include(d => d.Category)
+                .Include(d => d.Ingredients)
+                .ToListAsync();
         }
 
         public void Add(Dish dish)
