@@ -45,7 +45,7 @@ namespace TomasosPizzeria.Api.Controllers
 
                 return Ok(orders);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
