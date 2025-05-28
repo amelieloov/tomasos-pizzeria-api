@@ -89,13 +89,10 @@ namespace TomasosPizzeria.Core.Services
             return token;
         }
 
-        public async Task UpdateUserAsync(string userId, UserDTO userDto)
+        public async Task UpdateUserAsync(string userId, UserUpdateDTO userDto)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new Exception("User not found");
-
-            if (!string.IsNullOrEmpty(userDto.UserName))
-                user.UserName = userDto.UserName;
 
             if (!string.IsNullOrEmpty(userDto.Email))
                 user.Email = userDto.Email;

@@ -56,7 +56,7 @@ namespace TomasosPizzeria.Api.Controllers
 
         [Authorize]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateUserAsync(UserDTO user)
+        public async Task<IActionResult> UpdateUserAsync(UserUpdateDTO user)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString();
             await _service.UpdateUserAsync(userId, user);

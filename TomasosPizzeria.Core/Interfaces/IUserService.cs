@@ -7,7 +7,7 @@ namespace TomasosPizzeria.Core.Interfaces
     {
         Task<bool> Register(UserDTO user);
         Task<string?> Login(LoginDTO user);
-        Task UpdateUserAsync(string userId, UserDTO userDto);
+        Task UpdateUserAsync(string userId, UserUpdateDTO userDto);
         Task<UserReadDTO> GetUserAsync(string userId);
         Task<bool> UpdateUserRoleAsync(string username, string newRole);
 
