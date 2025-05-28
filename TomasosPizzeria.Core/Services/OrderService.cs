@@ -25,11 +25,12 @@ namespace TomasosPizzeria.Core.Services
             var user = await _userManager.FindByIdAsync(userId);
             var userRoles = await _userManager.GetRolesAsync(user);
             var dishQuantity = dishDtos.Sum(d => d.Quantity);
-            user.BonusPoints += 10 * dishQuantity;
+            if (userRoles.Contains("PremiumUser"))
+                user.BonusPoints += 10 * dishQuantity;
 
             totalPrice = ApplyPremiumUserDiscount(totalPrice, userRoles, dishQuantity);
             var orderItems = GenerateOrderItems(dishDtos, user);
-            orderItems = ApplyBonusIfEligible(orderItems, user);
+            orderItems = ApplyBonusIfEligible(orderItems, user, userRoles);
 
             var order = new Order()
             {
@@ -84,9 +85,9 @@ namespace TomasosPizzeria.Core.Services
             return orderItems;
         }
 
-        private List<OrderItem> ApplyBonusIfEligible(List<OrderItem> orderItems, ApplicationUser user)
+        private List<OrderItem> ApplyBonusIfEligible(List<OrderItem> orderItems, ApplicationUser user, IList<string> userRoles)
         {
-            if (user.BonusPoints >= 100)
+            if (userRoles.Contains("PremiumUser") && user.BonusPoints >= 100)
             {
                 orderItems.Add(new OrderItem { DishId = 2, Quantity = 1 });
                 user.BonusPoints -= 100;
